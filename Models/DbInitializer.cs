@@ -2,6 +2,7 @@
 {
     public class DbInitializer
     {
+        //Método para inicializar la base de datos
         public static void Initialize(HomeBankingContext context)
         {
             if (!context.Clients.Any())
