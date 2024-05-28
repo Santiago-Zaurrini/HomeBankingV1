@@ -1,4 +1,6 @@
-﻿namespace HomeBanking.Models
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace HomeBanking.Models
 {
     public class DbInitializer
     {
@@ -21,6 +23,23 @@
                 context.SaveChanges();
             }
 
+
+
+            if (!context.Accounts.Any())
+            {
+                Client santiClient = context.Clients.FirstOrDefault(cl => cl.Email == "szaurrini@gmail.com");
+                if (santiClient != null)
+                {
+                    var santiAccounts = new Account[]
+                    {
+                        new Account {Number = "VIN001",CreationDate = DateTime.Now, ClientId = santiClient.Id, Balance=150000 },
+                        new Account {Number = "VIN002",CreationDate = DateTime.Now, ClientId = santiClient.Id, Balance=912000 },
+                    };
+                    context.Accounts.AddRange(santiAccounts);
+
+                    context.SaveChanges();
+                }
+            }
         }
     }
 }
