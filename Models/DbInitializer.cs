@@ -1,5 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
+﻿
 namespace HomeBanking.Models
 {
     public class DbInitializer
@@ -16,7 +15,7 @@ namespace HomeBanking.Models
                     new Client { Email = "mlopez@gmail.com", FirstName="Maria", LastName="Lopez", Password="123458"},
                     new Client { Email = "szaurrini@gmail.com", FirstName="Santiago", LastName="Zaurrini", Password="31912"}
                 };
-
+                //Agregar todos los clientes
                 context.Clients.AddRange(clients);
 
                 //Guardar Cambios
@@ -37,6 +36,26 @@ namespace HomeBanking.Models
                     };
                     context.Accounts.AddRange(santiAccounts);
 
+                    context.SaveChanges();
+                }
+            }
+
+            if (!context.Transactions.Any())
+            {
+                Account account1 = context.Accounts.FirstOrDefault(ac => ac.Number == "VIN001");
+                if(account1 != null)
+                {
+                    var accounTransactions = new Transaction[]
+                    {
+                        new Transaction { AccountId= account1.Id, Amount = 10000, Date= DateTime.Now.AddHours(-2),
+                            Description = "Transferencia recibida", Type = TransactionType.CREDIT.ToString()},
+                        new Transaction { AccountId= account1.Id, Amount = -5000, Date= DateTime.Now.AddMinutes(-1),
+                            Description = "Compra exitosa!", Type = TransactionType.DEBIT.ToString()},
+                        new Transaction { AccountId= account1.Id, Amount = 5000, Date= DateTime.Now.AddHours(-1),
+                            Description = "Transferencia recibida", Type = TransactionType.CREDIT.ToString()},
+                    };
+
+                    context.Transactions.AddRange(accounTransactions);
                     context.SaveChanges();
                 }
             }

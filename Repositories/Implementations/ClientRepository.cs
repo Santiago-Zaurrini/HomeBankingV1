@@ -9,7 +9,7 @@ namespace HomeBanking.Repositories.Implementations
         {
         }
 
-        public Client FindById(long id)
+        public Client FindClientById(long id)
         {
             return FindByCondition(client => client.Id == id)
                 .Include(client => client.Accounts)

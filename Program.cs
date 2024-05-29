@@ -15,6 +15,7 @@ builder.Services.AddDbContext<HomeBankingContext>(options =>
 
 //Add repositories to context
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 var app = builder.Build();
 
