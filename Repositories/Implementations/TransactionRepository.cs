@@ -8,6 +8,18 @@ namespace HomeBanking.Repositories.Implementations
         {
         }
 
+        public Transaction GetTransactionById(long id)
+        {
+            return FindByCondition(tr => tr.Id == id)
+                .FirstOrDefault();
+        }
+
+        public IEnumerable<Transaction> GetAllTransactions()
+        {
+            return FindAll()
+                .ToList();
+        }
+
         public void Save(Transaction transaction)
         {
             Create(transaction);

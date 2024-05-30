@@ -22,5 +22,11 @@ namespace HomeBanking.Repositories.Implementations
                 .Include(ac => ac.Transactions)
                 .ToList();
         }
+
+        public void Save(Account account)
+        {
+            Create(account);
+            SaveChanges();
+        }
     }
 }
