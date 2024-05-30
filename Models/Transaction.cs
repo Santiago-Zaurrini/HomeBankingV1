@@ -1,6 +1,4 @@
 ﻿
-using System.Text.Json.Serialization;
-
 namespace HomeBanking.Models
 {
     public class Transaction
