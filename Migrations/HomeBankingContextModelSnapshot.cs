@@ -49,6 +49,45 @@ namespace HomeBanking.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("HomeBanking.Models.Card", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CardHolder")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Color")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Cvv")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Number")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ThruDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("Cards");
+                });
+
             modelBuilder.Entity("HomeBanking.Models.Client", b =>
                 {
                     b.Property<long>("Id")
@@ -166,6 +205,17 @@ namespace HomeBanking.Migrations
                     b.Navigation("Client");
                 });
 
+            modelBuilder.Entity("HomeBanking.Models.Card", b =>
+                {
+                    b.HasOne("HomeBanking.Models.Client", "Client")
+                        .WithMany("Cards")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("HomeBanking.Models.ClientLoan", b =>
                 {
                     b.HasOne("HomeBanking.Models.Client", "Client")
@@ -204,6 +254,8 @@ namespace HomeBanking.Migrations
             modelBuilder.Entity("HomeBanking.Models.Client", b =>
                 {
                     b.Navigation("Accounts");
+
+                    b.Navigation("Cards");
 
                     b.Navigation("ClientLoans");
                 });

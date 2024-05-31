@@ -1,4 +1,7 @@
-﻿namespace HomeBanking.Models
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Drawing;
+
+namespace HomeBanking.Models
 {
     public class DbInitializer
     {
@@ -9,10 +12,11 @@
             {
                 var clients = new Client[]
                 {
+                    new Client { Email = "szaurrini@gmail.com", FirstName="Santiago", LastName="Zaurrini", Password="31912"},
                     new Client { Email = "vcoronado@gmail.com", FirstName="Victor", LastName="Coronado", Password="123456"},
                     new Client { Email = "jperez@gmail.com", FirstName="Juan", LastName="Perez", Password="123457"},
-                    new Client { Email = "mlopez@gmail.com", FirstName="Maria", LastName="Lopez", Password="123458"},
-                    new Client { Email = "szaurrini@gmail.com", FirstName="Santiago", LastName="Zaurrini", Password="31912"}
+                    new Client { Email = "mlopez@gmail.com", FirstName="Maria", LastName="Lopez", Password="123458"}
+                    
                 };
                 //Agregar todos los clientes
                 context.Clients.AddRange(clients);
@@ -110,6 +114,38 @@
                         context.ClientLoans.Add(clientLoan3);
                     }
 
+                    context.SaveChanges();
+                }
+            }
+            if (!context.Cards.Any())
+            {
+                var client1 = context.Clients.FirstOrDefault(cl => cl.Email == "szaurrini@gmail.com");
+                if (client1 != null)
+                {
+                    var cards = new Card[]
+                    {
+                        new Card {
+                                ClientId= client1.Id,
+                                CardHolder = client1.FirstName + " " + client1.LastName,
+                                Type = CardType.DEBIT.ToString(),
+                                Color = CardColor.GOLD.ToString(),
+                                Number = "3325-6745-7876-4445",
+                                Cvv = 990,
+                                FromDate= DateTime.Now,
+                                ThruDate= DateTime.Now.AddYears(4)
+                        },
+                        new Card {
+                                ClientId= client1.Id,
+                                CardHolder = client1.FirstName + " " + client1.LastName,
+                                Type = CardType.CREDIT.ToString(),
+                                Color = CardColor.TITANIUM.ToString(),
+                                Number = "2234-6745-552-7888",
+                                Cvv = 750,
+                                FromDate= DateTime.Now,
+                                ThruDate= DateTime.Now.AddYears(5),
+                        },
+                    };
+                    context.Cards.AddRange(cards);
                     context.SaveChanges();
                 }
             }
