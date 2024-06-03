@@ -1,4 +1,5 @@
 ﻿using HomeBanking.DTOs;
+using HomeBanking.Models;
 using HomeBanking.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,30 @@ namespace HomeBanking.Controllers
                 var client = _clientRepository.FindClientById(id);
                 var clientDTO = new ClientDTO(client);
                 return Ok(clientDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("current")]
+        public IActionResult GetCurrentUser()
+        {
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Forbid();
+                }
+                Client client = _clientRepository.FindClientByEmail(email);
+                if (client == null)
+                {
+                    return Forbid();
+                }
+                var clientUserDTO = new ClientDTO(client);
+                return Ok(clientUserDTO);
             }
             catch (Exception ex)
             {
