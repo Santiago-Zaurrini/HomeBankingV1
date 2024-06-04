@@ -1,4 +1,5 @@
-﻿using HomeBanking.Models;
+﻿using HomeBanking.DTOs;
+using HomeBanking.Models;
 using HomeBanking.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -11,26 +12,37 @@ namespace HomeBanking.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private IClientRepository _clientRepository;
+        private readonly IClientRepository _clientRepository;
         public AuthController(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Client client)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             try
             {
-                Client user = _clientRepository.FindClientByEmail(client.Email);
-                if(user == null || !String.Equals(user.Password, client.Password))
+                Client user = _clientRepository.FindClientByEmail(loginDTO.Email);
+                if(user == null)
                 {
-                    return Unauthorized();
+                    return StatusCode(403, "User not found");
                 }
+                if (!String.Equals(user.Password, loginDTO.Password))
+                {
+                    return StatusCode(403, "Invalid user info");
+                }
+
                 var claims = new List<Claim>
                 {
                     new Claim("Client", user.Email)
                 };
+
+                if (user.Email.Equals("szaurrini@gmail.com"))
+                {
+                    claims.Add(new Claim("Admin", "true"));
+                }
+
                 var claimsIdentity = new ClaimsIdentity(claims,
                     CookieAuthenticationDefaults.AuthenticationScheme);
 

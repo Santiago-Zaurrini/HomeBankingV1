@@ -1,6 +1,7 @@
 ﻿using HomeBanking.DTOs;
 using HomeBanking.Models;
 using HomeBanking.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeBanking.Controllers
@@ -16,6 +17,7 @@ namespace HomeBanking.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "AdminOnly")]
         public IActionResult GetAllClients()
         {
             try
@@ -49,6 +51,7 @@ namespace HomeBanking.Controllers
         }
 
         [HttpGet("current")]
+        [Authorize(Policy = "ClientOnly")]
         public IActionResult GetCurrentUser()
         {
             try
@@ -56,12 +59,12 @@ namespace HomeBanking.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (string.IsNullOrEmpty(email))
                 {
-                    return Forbid();
+                    return StatusCode(403, "User not found");
                 }
                 Client client = _clientRepository.FindClientByEmail(email);
                 if (client == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "User not found");
                 }
                 var clientUserDTO = new ClientDTO(client);
                 return Ok(clientUserDTO);
@@ -73,32 +76,32 @@ namespace HomeBanking.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostClient([FromBody] ClientUserDTO client)
+        public IActionResult PostClient([FromBody] ClientUserDTO clientUserDTO)
         {
             try
             {
-                if (String.IsNullOrEmpty(client.Email) || String.IsNullOrEmpty(client.Password) || String.IsNullOrEmpty(client.FirstName)
-                    || String.IsNullOrEmpty(client.LastName))
+                if (String.IsNullOrEmpty(clientUserDTO.Email) || String.IsNullOrEmpty(clientUserDTO.Password) || String.IsNullOrEmpty(clientUserDTO.FirstName)
+                    || String.IsNullOrEmpty(clientUserDTO.LastName))
                 {
-                    return StatusCode(403, "Datos Inválidos");
+                    return StatusCode(400, "Datos faltantes");
                 }
                   
-                Client clientExists = _clientRepository.FindClientByEmail(client.Email);
+                Client clientExists = _clientRepository.FindClientByEmail(clientUserDTO.Email);
                 if (clientExists != null)
                 {
-                    return StatusCode(403, "Email está en uso");
+                    return StatusCode(400, "Email está en uso");
                 }
 
                 var newClient = new Client
                 {
-                    Email = client.Email,
-                    Password = client.Password,
-                    FirstName = client.FirstName,
-                    LastName = client.LastName,
+                    Email = clientUserDTO.Email,
+                    Password = clientUserDTO.Password,
+                    FirstName = clientUserDTO.FirstName,
+                    LastName = clientUserDTO.LastName,
                 };
 
                 _clientRepository.Save(newClient);
-                return Created("", client);
+                return StatusCode(201, new ClientDTO(clientUserDTO));
             }
             catch (Exception ex)
             {
