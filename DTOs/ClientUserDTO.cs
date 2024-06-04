@@ -16,5 +16,10 @@ namespace HomeBanking.DTOs
             Email = client.Email;
             Password = client.Password;
         }
+
+        public ClientUserDTO()
+        {
+            
+        }
     }
 }

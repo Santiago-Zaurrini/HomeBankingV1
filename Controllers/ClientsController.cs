@@ -71,5 +71,39 @@ namespace HomeBanking.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost]
+        public IActionResult PostClient([FromBody] ClientUserDTO client)
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(client.Email) || String.IsNullOrEmpty(client.Password) || String.IsNullOrEmpty(client.FirstName)
+                    || String.IsNullOrEmpty(client.LastName))
+                {
+                    return StatusCode(403, "Datos Inválidos");
+                }
+                  
+                Client clientExists = _clientRepository.FindClientByEmail(client.Email);
+                if (clientExists != null)
+                {
+                    return StatusCode(403, "Email está en uso");
+                }
+
+                var newClient = new Client
+                {
+                    Email = client.Email,
+                    Password = client.Password,
+                    FirstName = client.FirstName,
+                    LastName = client.LastName,
+                };
+
+                _clientRepository.Save(newClient);
+                return Created("", client);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
