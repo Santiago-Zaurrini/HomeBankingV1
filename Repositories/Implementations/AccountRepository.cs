@@ -16,6 +16,13 @@ namespace HomeBanking.Repositories.Implementations
                 .FirstOrDefault();
         }
 
+        public IEnumerable<Account> FindAccountsByClient(long clientId)
+        {
+            return FindByCondition(ac => ac.ClientId == clientId)
+                .Include(ac => ac.Transactions)
+                .ToList();
+        }
+
         public IEnumerable<Account> GetAllAccounts()
         {
             return FindAll()
@@ -23,10 +30,17 @@ namespace HomeBanking.Repositories.Implementations
                 .ToList();
         }
 
+        public Account IsAccountNumberInUse(string accountNumber)
+        {
+            return FindByCondition(a => a.Number == accountNumber)
+                .FirstOrDefault();
+        }
+
         public void Save(Account account)
         {
             Create(account);
             SaveChanges();
         }
+
     }
 }
