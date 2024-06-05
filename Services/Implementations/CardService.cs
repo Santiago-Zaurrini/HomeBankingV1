@@ -44,11 +44,66 @@ namespace HomeBanking.Services.Implementations
             _cardRepository.Save(card);
         }
 
-        int ICardService.GenerateCVV()
+        public int GenerateCVV()
         {
             Random random = new Random();
             int randomNumber = random.Next(100, 1000);
             return randomNumber;
+        }
+
+        public bool HasReachedCardLimit(Client client)
+        {
+            return client.Cards.Count >= 6;
+        }
+
+        public bool HasReachedCardTypeLimit(Client client, string cardType)
+        {
+            int cardCount = client.Cards.Count(c => c.Type == cardType);
+            return cardCount >= 3;
+        }
+
+        public void CreateCardClient(Client client, string cardType, string cardColor)
+        {
+            if (HasReachedCardLimit(client))
+            {
+                throw new Exception("Alcanzado el límite (6) de tarjetas totales.");
+            }
+
+            if (HasReachedCardTypeLimit(client, cardType))
+            {
+                if (cardType == CardType.DEBIT.ToString())
+                {
+                    throw new Exception("Alcanzado el límite (3) de tarjetas de débito.");
+                }
+                else if (cardType == CardType.CREDIT.ToString())
+                {
+                    throw new Exception("Alcanzado el límite (3) de tarjetas de crédito.");
+                }
+            }
+
+            if (HasDuplicate(client, cardType, cardColor))
+            {
+                throw new Exception("Ya existe una tarjeta con el mismo tipo y color.");
+            }
+
+            var newCard = new Card
+            {
+                CardHolder = client.FirstName + " " + client.LastName,
+                ClientId = client.Id,
+                Type = cardType,
+                Color = cardColor,
+                FromDate = DateTime.Now,
+                ThruDate = DateTime.Now.AddYears(5),
+                Number = GenerateUniqueNumber(),
+                Cvv = GenerateCVV(),
+            };
+
+            Save(newCard);
+        }
+
+        public bool HasDuplicate(Client client, string cardType, string cardColor)
+        {
+            return client.Cards.Any(c => c.Type == cardType && c.Color == cardColor);
         }
     }
 }

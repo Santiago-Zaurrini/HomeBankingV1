@@ -182,35 +182,8 @@ namespace HomeBanking.Controllers
 
                 Client client = GetCurrentClient();
 
-                int debitCards = client.Cards.Count(c => c.Type == CardType.DEBIT.ToString());
-                int creditCards = client.Cards.Count(c => c.Type == CardType.CREDIT.ToString());
+                _cardService.CreateCardClient(client, cardClientDTO.Type, cardClientDTO.Color);
 
-                if (client.Cards.Count >= 6)
-                {
-                    return StatusCode(403, "Alcanzado el límite (6) de tarjetas totales.");
-                }
-                else if (cardClientDTO.Type == CardType.DEBIT.ToString() && debitCards >= 3)
-                {
-                    return StatusCode(403, "Alcanzado el límite (3) de tarjetas de débito.");
-                }
-                else if (cardClientDTO.Type == CardType.CREDIT.ToString() && creditCards >= 3)
-                {
-                    return StatusCode(403, "Alcanzado el límite (3) de tarjetas de crédito.");
-                }
-
-
-                var newCard = new Card
-                {
-                    CardHolder = client.FirstName + " " + client.LastName,
-                    ClientId = client.Id,
-                    Type = cardClientDTO.Type,
-                    Color = cardClientDTO.Color,
-                    FromDate = DateTime.Now,
-                    ThruDate = DateTime.Now.AddYears(5),
-                    Number = _cardService.GenerateUniqueNumber(),
-                    Cvv = _cardService.GenerateCVV(),
-                };
-                _cardService.Save(newCard);
                 return StatusCode(201, "Tarjeta creada");
             }
             catch (Exception ex)
