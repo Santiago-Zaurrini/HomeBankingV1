@@ -25,5 +25,11 @@ namespace HomeBanking.Repositories.Implementations
             Create(transaction);
             SaveChanges();
         }
+
+        public void UpdateTransaction(Transaction transaction)
+        {
+            Update(transaction);
+            SaveChanges();
+        }
     }
 }

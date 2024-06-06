@@ -1,4 +1,5 @@
-﻿using HomeBanking.Models;
+﻿using HomeBanking.DTOs;
+using HomeBanking.Models;
 using HomeBanking.Repositories;
 
 namespace HomeBanking.Services.Implementations
@@ -38,12 +39,6 @@ namespace HomeBanking.Services.Implementations
             } while (_cardRepository.isNumberInUse(number) != null);
             return number;
         }
-
-        public void Save(Card card)
-        {
-            _cardRepository.Save(card);
-        }
-
         public int GenerateCVV()
         {
             Random random = new Random();
@@ -61,37 +56,45 @@ namespace HomeBanking.Services.Implementations
             int cardCount = client.Cards.Count(c => c.Type == cardType);
             return cardCount >= 3;
         }
-
-        public void CreateCardClient(Client client, string cardType, string cardColor)
+        public bool HasDuplicate(Client client, string cardType, string cardColor)
         {
+            return client.Cards.Any(c => c.Type == cardType && c.Color == cardColor);
+        }
+        public void CreateCardClient(Client client, CardClientDTO cardClientDTO)
+        {
+            if (string.IsNullOrEmpty(cardClientDTO.Type) || string.IsNullOrEmpty(cardClientDTO.Color))
+            {
+                throw new Exception("Datos faltantes");
+            }
+
             if (HasReachedCardLimit(client))
             {
                 throw new Exception("Alcanzado el límite (6) de tarjetas totales.");
             }
 
-            if (HasReachedCardTypeLimit(client, cardType))
+            if (HasReachedCardTypeLimit(client, cardClientDTO.Type))
             {
-                if (cardType == CardType.DEBIT.ToString())
+                if (cardClientDTO.Type == CardType.DEBIT.ToString())
                 {
                     throw new Exception("Alcanzado el límite (3) de tarjetas de débito.");
                 }
-                else if (cardType == CardType.CREDIT.ToString())
+                else if (cardClientDTO.Type == CardType.CREDIT.ToString())
                 {
                     throw new Exception("Alcanzado el límite (3) de tarjetas de crédito.");
                 }
             }
 
-            if (HasDuplicate(client, cardType, cardColor))
+            if (HasDuplicate(client, cardClientDTO.Type, cardClientDTO.Color))
             {
                 throw new Exception("Ya existe una tarjeta con el mismo tipo y color.");
             }
 
             var newCard = new Card
             {
-                CardHolder = client.FirstName + " " + client.LastName,
+                CardHolder = $"{client.FirstName} {client.LastName}",
                 ClientId = client.Id,
-                Type = cardType,
-                Color = cardColor,
+                Type = cardClientDTO.Type,
+                Color = cardClientDTO.Color,
                 FromDate = DateTime.Now,
                 ThruDate = DateTime.Now.AddYears(5),
                 Number = GenerateUniqueNumber(),
@@ -100,10 +103,14 @@ namespace HomeBanking.Services.Implementations
 
             Save(newCard);
         }
-
-        public bool HasDuplicate(Client client, string cardType, string cardColor)
+        public void Save(Card card)
         {
-            return client.Cards.Any(c => c.Type == cardType && c.Color == cardColor);
+            _cardRepository.Save(card);
+        }
+
+        public IEnumerable<Card> GetCurrentCards(long clientId)
+        {
+            return _cardRepository.GetClientCards(clientId);
         }
     }
 }

@@ -33,5 +33,61 @@ namespace HomeBanking.Services.Implementations
         {
             _accountRepository.Save(account);
         }
+
+        public Account FindAccountByNumber(string number)
+        {
+            return _accountRepository.FindAccountByNumber(number);
+        }
+        public Account FindAccountById(long id)
+        {
+            return _accountRepository.FindAccountById(id);
+        }
+
+        public IEnumerable<Account> FindAccountsByClient(long clientId)
+        {
+            return _accountRepository.FindAccountsByClient(clientId);
+        }
+
+        public IEnumerable<Account> GetAllAccounts()
+        {
+            return _accountRepository.GetAllAccounts();
+        }
+
+        public Account CreateAccount(Client client)
+        {
+            var newAccount = new Account
+            {
+                CreationDate = DateTime.Now,
+                Balance = 0,
+                ClientId = client.Id,
+                Transactions = new List<Transaction>(),
+                Number = GenerateUniqueAccountNumber()
+            };
+
+            Save(newAccount);
+
+            return newAccount;
+        }
+
+        public Account CreateAccForExistingClient(Client client)
+        {
+            if (client.Accounts.Count >= 3)
+            {
+                throw new Exception("Alcanzado el límite de cuentas.");
+            }
+
+            var newAccount = new Account
+            {
+                CreationDate = DateTime.Now,
+                Balance = 0,
+                ClientId = client.Id,
+                Transactions = new List<Transaction>(),
+                Number = GenerateUniqueAccountNumber() 
+            };
+
+            Save(newAccount);
+
+            return newAccount;
+        }
     }
 }

@@ -4,11 +4,13 @@ namespace HomeBanking.Repositories
 {
     public interface IAccountRepository
     {
-        IEnumerable<Account> GetAllAccounts();
         Account FindAccountById(long id);
-        IEnumerable<Account> FindAccountsByClient(long clientId);
-        public void Save(Account account);
+        Account FindAccountByNumber(string number);
         Account IsAccountNumberInUse(string accountNumber);
+        IEnumerable<Account> GetAllAccounts();
+        IEnumerable<Account> FindAccountsByClient(long clientId);
+        void Save(Account account);
+        void UpdateAccount(Account account);
 
     }
 }

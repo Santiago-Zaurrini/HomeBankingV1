@@ -29,6 +29,9 @@ builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IClientService, ClientService>();
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
       .AddCookie(options =>
