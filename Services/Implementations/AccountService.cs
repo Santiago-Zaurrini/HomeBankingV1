@@ -82,12 +82,17 @@ namespace HomeBanking.Services.Implementations
                 Balance = 0,
                 ClientId = client.Id,
                 Transactions = new List<Transaction>(),
-                Number = GenerateUniqueAccountNumber() 
+                Number = GenerateUniqueAccountNumber()
             };
 
             Save(newAccount);
 
             return newAccount;
+        }
+
+        public void Update(Account account)
+        {
+            _accountRepository.UpdateAccount(account);
         }
     }
 }

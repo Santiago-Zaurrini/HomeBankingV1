@@ -1,4 +1,5 @@
 ﻿using HomeBanking.DTOs;
+using HomeBanking.Exceptions;
 using HomeBanking.Models;
 using HomeBanking.Repositories;
 
@@ -64,29 +65,29 @@ namespace HomeBanking.Services.Implementations
         {
             if (string.IsNullOrEmpty(cardClientDTO.Type) || string.IsNullOrEmpty(cardClientDTO.Color))
             {
-                throw new Exception("Datos faltantes");
+                throw new CustomException("Datos faltantes", 403);
             }
 
             if (HasReachedCardLimit(client))
             {
-                throw new Exception("Alcanzado el límite (6) de tarjetas totales.");
+                throw new CustomException("Alcanzado el límite (6) de tarjetas totales.", 403);
             }
 
             if (HasReachedCardTypeLimit(client, cardClientDTO.Type))
             {
                 if (cardClientDTO.Type == CardType.DEBIT.ToString())
                 {
-                    throw new Exception("Alcanzado el límite (3) de tarjetas de débito.");
+                    throw new CustomException("Alcanzado el límite (3) de tarjetas de débito.", 403);
                 }
                 else if (cardClientDTO.Type == CardType.CREDIT.ToString())
                 {
-                    throw new Exception("Alcanzado el límite (3) de tarjetas de crédito.");
+                    throw new CustomException("Alcanzado el límite (3) de tarjetas de crédito.", 403);
                 }
             }
 
             if (HasDuplicate(client, cardClientDTO.Type, cardClientDTO.Color))
             {
-                throw new Exception("Ya existe una tarjeta con el mismo tipo y color.");
+                throw new CustomException("Ya existe una tarjeta con el mismo tipo y color.", 403);
             }
 
             var newCard = new Card

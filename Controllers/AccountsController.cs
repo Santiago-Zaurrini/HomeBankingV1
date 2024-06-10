@@ -1,4 +1,5 @@
 ﻿using HomeBanking.DTOs;
+using HomeBanking.Exceptions;
 using HomeBanking.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,12 +21,11 @@ namespace HomeBanking.Controllers
             try
             {
                 var accounts = _accountService.GetAllAccounts();
-                var accountsDTO = accounts.Select(ac => new AccountDTO(ac)).ToList();
-                return Ok(accountsDTO);
+                return Ok(accounts.Select(ac => new AccountDTO(ac)).ToList());
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -35,12 +35,11 @@ namespace HomeBanking.Controllers
             try
             {
                 var account = _accountService.FindAccountById(id);
-                var accountDTO = new AccountDTO(account);
-                return Ok(accountDTO);
+                return Ok(new AccountDTO(account));
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
     }

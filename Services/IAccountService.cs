@@ -12,5 +12,6 @@ namespace HomeBanking.Services
         IEnumerable<Account> GetAllAccounts();
         IEnumerable<Account> FindAccountsByClient(long clientId);
         void Save(Account account);
+        void Update(Account account);
     }
 }

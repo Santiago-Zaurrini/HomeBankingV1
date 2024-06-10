@@ -51,6 +51,7 @@ namespace HomeBanking.Repositories.Implementations
         {
             Update(account);
             SaveChanges();
+            RepositoryContext.ChangeTracker.Clear();
         }
     }
 }

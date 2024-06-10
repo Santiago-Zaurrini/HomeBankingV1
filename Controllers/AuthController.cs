@@ -1,6 +1,6 @@
 ﻿using HomeBanking.DTOs;
-using HomeBanking.Models;
-using HomeBanking.Repositories;
+using HomeBanking.Exceptions;
+using HomeBanking.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +12,10 @@ namespace HomeBanking.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IClientRepository _clientRepository;
-        public AuthController(IClientRepository clientRepository)
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
         {
-            _clientRepository = clientRepository;
+            _authService = authService;
         }
 
         [HttpPost("login")]
@@ -23,37 +23,14 @@ namespace HomeBanking.Controllers
         {
             try
             {
-                Client user = _clientRepository.FindClientByEmail(loginDTO.Email);
-                if(user == null)
-                {
-                    return StatusCode(403, "User not found");
-                }
-                if (!String.Equals(user.Password, loginDTO.Password))
-                {
-                    return StatusCode(403, "Invalid user info");
-                }
-
-                var claims = new List<Claim>
-                {
-                    new Claim("Client", user.Email)
-                };
-
-                if (user.Email.Equals("szaurrini@gmail.com"))
-                {
-                    claims.Add(new Claim("Admin", "true"));
-                }
-
-                var claimsIdentity = new ClaimsIdentity(claims,
-                    CookieAuthenticationDefaults.AuthenticationScheme);
-
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity));
+                    new ClaimsPrincipal(_authService.GetIdentity(loginDTO)));
                 return Ok();
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -66,9 +43,9 @@ namespace HomeBanking.Controllers
                     CookieAuthenticationDefaults.AuthenticationScheme);
                 return Ok();
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
     }

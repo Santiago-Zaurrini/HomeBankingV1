@@ -26,19 +26,26 @@ namespace HomeBanking.Services.Implementations
             return _transactionRepository.GetTransactionById(id);
         }
 
+        public void Save(Transaction transaction)
+        {
+            _transactionRepository.Save(transaction);
+        }
+
         public void Transfer(string originNumber, string destinationNumber, double amount, string description)
         {
             var originAcc = _accountRepository.FindAccountByNumber(originNumber);
             var destinationAcc = _accountRepository.FindAccountByNumber(destinationNumber);
 
             if (originAcc == null)
-                throw new CustomException("Cuenta origen no encontrada.", HttpStatusCode.Forbidden);
+                throw new CustomException("Cuenta origen no encontrada.", 403);
             if (destinationAcc == null)
-                throw new CustomException("Cuenta destino no encontrada.", HttpStatusCode.Forbidden);
+                throw new CustomException("Cuenta destino no encontrada.", 403);
             if (originNumber == destinationNumber)
-                throw new CustomException("No se puede realizar la operación en la misma cuenta.", HttpStatusCode.BadRequest);
+                throw new CustomException("No se puede realizar la operación en la misma cuenta.", 403);
             if (amount > originAcc.Balance)
-                throw new CustomException("Saldo insuficiente para la operación.", HttpStatusCode.BadRequest);
+                throw new CustomException("Saldo insuficiente para la operación.", 403);
+            if (amount <= 0)
+                throw new CustomException("Monto debe ser mayor a 0", 403);
 
             originAcc.Balance -= amount;
             _accountRepository.UpdateAccount(originAcc);
@@ -50,7 +57,7 @@ namespace HomeBanking.Services.Implementations
             {
                 Type = "DEBIT",
                 Amount = -amount,
-                Description = description,
+                Description = description + " | Enviado a cuenta " + destinationAcc.Number.ToString(),
                 Date = DateTime.Now,
                 AccountId = originAcc.Id,
             };
@@ -60,7 +67,7 @@ namespace HomeBanking.Services.Implementations
             {
                 Type = "CREDIT",
                 Amount = amount,
-                Description = description,
+                Description = description + " | Recibido de cuenta " + originAcc.Number.ToString(),
                 Date = DateTime.Now,
                 AccountId = destinationAcc.Id,
             };

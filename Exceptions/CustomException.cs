@@ -1,12 +1,11 @@
-﻿using System.Net;
-
+﻿
 namespace HomeBanking.Exceptions
 {
     public class CustomException : Exception
     {
-        public HttpStatusCode StatusCode;
+        public int StatusCode;
 
-        public CustomException(string message, HttpStatusCode _statusCode) : base(message)
+        public CustomException(string message, int _statusCode) : base(message)
         {
             StatusCode = _statusCode;
         }

@@ -1,4 +1,5 @@
 ﻿using HomeBanking.DTOs;
+using HomeBanking.Exceptions;
 using HomeBanking.Models;
 using HomeBanking.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -30,9 +31,9 @@ namespace HomeBanking.Controllers
                 var clients = _clientService.GetAllClients();
                 return Ok(clients.Select(c => new ClientDTO(c)).ToList());
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -44,9 +45,9 @@ namespace HomeBanking.Controllers
                 var client = _clientService.FindClientById(id);
                 return Ok(new ClientDTO(client));
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -60,9 +61,9 @@ namespace HomeBanking.Controllers
                 Client client = _clientService.GetCurrent(email);
                 return Ok(new ClientDTO(client));
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -75,9 +76,9 @@ namespace HomeBanking.Controllers
                 Account newAccount = _accountService.CreateAccount(newClient);
                 return StatusCode(201, new ClientDTO(clientUserDTO));
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -92,9 +93,9 @@ namespace HomeBanking.Controllers
                 Account newAccount = _accountService.CreateAccForExistingClient(client);
                 return StatusCode(201, "Cuenta creada");
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -109,9 +110,9 @@ namespace HomeBanking.Controllers
                 var accounts = _accountService.FindAccountsByClient(client.Id);
                 return Ok(accounts.Select(a => new AccountDTO(a)).ToList());
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -127,9 +128,9 @@ namespace HomeBanking.Controllers
                 _cardService.CreateCardClient(client, cardClientDTO);
                 return StatusCode(201, "Tarjeta creada");
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
 
@@ -143,9 +144,9 @@ namespace HomeBanking.Controllers
                 var cards = _cardService.GetCurrentCards(client.Id);
                 return Ok(cards.Select(c => new CardDTO(c)).ToList());
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(ex.StatusCode, ex.Message);
             }
         }
     }
