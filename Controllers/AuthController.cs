@@ -48,5 +48,24 @@ namespace HomeBanking.Controllers
                 return StatusCode(ex.StatusCode, ex.Message);
             }
         }
+
+        /*TOKEN*/
+
+        [HttpPost("login/token")]
+        public IActionResult TokenLogin([FromBody] LoginDTO loginDTO)
+        {
+            try
+            {
+                // Generar el token JWT
+                string token =  _authService.GenerateToken(loginDTO);
+
+                // Devolver el token en la respuesta
+                return Ok(new { Token = token });
+            }
+            catch (CustomException ex)
+            {
+                return StatusCode(ex.StatusCode, ex.Message);
+            }
+        }
     }
 }

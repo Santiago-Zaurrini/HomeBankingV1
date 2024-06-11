@@ -149,5 +149,24 @@ namespace HomeBanking.Controllers
                 return StatusCode(ex.StatusCode, ex.Message);
             }
         }
+
+
+        [HttpGet("current/token")]
+        [Authorize(Policy = "TokenOnly")]
+        public IActionResult GetCurrentUserToken()
+        {
+            try
+            {
+                string email = User.FindFirst("Client")?.Value ?? string.Empty;
+                string role = User.FindFirst("Role")?.Value ?? string.Empty;
+                Console.WriteLine(role);
+                Client client = _clientService.GetCurrent(email);
+                return Ok(new ClientDTO(client));
+            }
+            catch (CustomException ex)
+            {
+                return StatusCode(ex.StatusCode, ex.Message);
+            }
+        }
     }
 }
