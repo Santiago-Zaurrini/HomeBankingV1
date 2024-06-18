@@ -20,14 +20,14 @@ HomeBanking es una aplicación web desarrollada para el Banco Vinotinto, que per
 - **Patrones de Diseño**: Generics, Repository, Service Layer, DTO, Builder, Inyección de Dependencias
 
 
-## Instalación & Configuración
+## Instalación & Configuración ⚙️
 
 **Prerrequisitos**
 - .NET Core SDK 8
 - SQL Server
 
 
-Configuración del proyecto
+Configuración del proyecto 📂
 
 1 - Clonar el repositorio.
 
@@ -47,7 +47,7 @@ Update-Database
 4 - Ejecutar la aplicación.
 
 
-## Patrones de Diseño
+## Patrones de Diseño 🔨
 
 - **Generics**: Se utilizan generics para crear repositorios que puedan manejar diferentes tipos de entidades de manera genérica y reutilizable.
 
